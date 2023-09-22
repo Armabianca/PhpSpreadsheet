@@ -1090,8 +1090,12 @@ class Worksheet extends WriterPart
                 $coords = Coordinate::coordinateFromString($cell);
 
                 $objWriter->startElement('brk');
-                $objWriter->writeAttribute('id', (string) ((int) $coords[0] - 1));
+                $objWriter->writeAttribute('id', (string) (((int) Coordinate::columnIndexFromString($coords[0])) - 1));
                 $objWriter->writeAttribute('man', '1');
+                $colBreakMax = $break->getMaxColOrRow();
+                if ($colBreakMax >= 0) {
+                    $objWriter->writeAttribute('max', "$colBreakMax");
+                }
                 $objWriter->endElement();
             }
 
