@@ -448,7 +448,21 @@ class Xlsx extends BaseWriter
                     if ($drawingFile !== false) {
                         //$drawingFile = ltrim($drawingFile, '.');
                         //$zipContent['xl' . $drawingFile] = $drawingXml;
-                        $zipContent['xl/drawings/drawing' . ($i + 1) . '.xml'] = $drawingXml;
+                        $currentXml = $zipContent['xl/drawings/drawing' . ($i + 1) . '.xml'] ?? null;
+                        if ($currentXml) {
+                            $currentDom = new \DOMDocument();
+                            $currentDom->loadXml($currentXml);
+                            $addDom = new \DOMDocument();
+                            $addDom->loadXml($drawingXml);
+                            if ($addDom->documentElement) {
+                                foreach($addDom->documentElement->childNodes as $node) {
+                                    $currentDom->documentElement->appendChild($currentDom->importNode($node, true));
+                                }
+                            }
+                            $zipContent['xl/drawings/drawing' . ($i + 1) . '.xml'] = $currentDom->saveXml();
+                        } else {
+                            $zipContent['xl/drawings/drawing' . ($i + 1) . '.xml'] = $drawingXml;
+                        }
                     }
                 }
             }
